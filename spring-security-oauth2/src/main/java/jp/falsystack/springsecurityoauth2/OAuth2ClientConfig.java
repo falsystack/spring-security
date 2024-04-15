@@ -1,27 +1,32 @@
 package jp.falsystack.springsecurityoauth2;
 
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.oauth2.client.registration.ClientRegistration;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.client.registration.ClientRegistrations;
-import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
+import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
-@Configuration
+@EnableWebSecurity
 public class OAuth2ClientConfig {
 
     @Bean
-    public ClientRegistrationRepository clientRegistrationRepository() {
-        return new InMemoryClientRegistrationRepository(keycloakClientRegistration());
+    MvcRequestMatcher.Builder mvc(
+            HandlerMappingIntrospector introspector) {
+        return new MvcRequestMatcher.Builder(introspector);
     }
 
-    ClientRegistration keycloakClientRegistration() {
-        return ClientRegistrations
-                .fromIssuerLocation("http://localhost:8080/realms/OAuth2")
-                .clientId("oauth2-client-app")
-//                .scope("openid")
-                .clientSecret("tOgXbt455UlUmDn9jEs73sAZXFlNhldR")
-                .redirectUri("http://localhost:8081/login/oauth2/code/keycloak")
+    @Bean
+    SecurityFilterChain securityFilterChain(HttpSecurity http, MvcRequestMatcher.Builder mvc) throws Exception {
+        return http
+                .authorizeHttpRequests(authRequest -> authRequest.anyRequest().authenticated())
+                .oauth2Login(Customizer.withDefaults())
+//                .authorizeHttpRequests(authRequest ->
+//                        authRequest.requestMatchers(
+//                                mvc.pattern("/loginPage")
+//                        ).permitAll().anyRequest().authenticated())
+//                .oauth2Login(oauth2 -> oauth2.loginPage("/loginPage"))
                 .build();
     }
 }

@@ -1,16 +1,13 @@
 package jp.falsystack.springsecurityoauth2;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequiredArgsConstructor
-public class IndexController {
+public class LoginController {
 
-
-    @GetMapping("/")
-    public String index() {
-        return "index";
+    @GetMapping("/loginPage")
+    public String loginPage() {
+        return "loginPage";
     }
 }
